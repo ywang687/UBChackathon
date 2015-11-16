@@ -5,7 +5,7 @@ var io = require('socket.io')(http);
 
 var usr = require('./public/User');
 
-//var port = 3000;
+var port = process.env.PORT || 5000;
 
 //var listOfSockets = [];
 listOfUsers = [];
@@ -95,11 +95,10 @@ io.on('connection', function (socket) {
 });
 
 // Starts the web server at the given port
-.listen(process.env.PORT || 3000)
-/*http.listen(port, function(){
+http.listen(port, function(){
   console.log('Listening on ' + port);
 });
-*/
+
 function updateUserChatroomID(userSocketID, newChatroomID){
   for(var ind=0; ind<listOfUsers.length; ind++){
     if(listOfUsers[ind].socketID == userSocketID){
