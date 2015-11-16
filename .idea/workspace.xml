@@ -92,7 +92,7 @@
         <option value="$PROJECT_DIR$/public/Class/Socket.js" />
         <option value="$PROJECT_DIR$/public/Class/ChatRoom.js" />
         <option value="$PROJECT_DIR$/public/Class/User.js" />
-        <option value="$PROJECT_DIR$/public/user.js" />
+        <!--<option value="$PROJECT_DIR$/public/user.js" />-->
         <option value="$PROJECT_DIR$/public/myModule.js" />
         <option value="$PROJECT_DIR$/public/User.js" />
         <option value="$PROJECT_DIR$/public/ChatRoom.js" />
