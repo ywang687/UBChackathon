@@ -37,6 +37,7 @@ io.on('connection', function (socket) {
   // tell the user about its new id
   //io.emit('user-newID', chatID);
   io.to(socket.id).emit('user-newID', chatID);
+  io.to(socket.id).emit('user-message', "Welcome to UmbraChat! How to use: 1) Create Chat Room with Random ID.  2) Share your Current Chat ID with someone.  3) That person enters your chat ID and clicks Submit.  At any point, input a numerical value into the Encryption Key. Two people with the same encryption key can speak without others understanding their conversation.");
 
 
 
