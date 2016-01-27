@@ -12,7 +12,7 @@ listOfUsers = [];
 
 // Serve our index.html page at the root url
 app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/public/index.html');
+  res.sendFile(__dirname + '/public/originalClient.html');
 });
 
 // Have express serve all of our files in the public directory
