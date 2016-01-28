@@ -16,7 +16,7 @@ app.get('/', function (req, res) {
 app.use(express.static('public'));
 // Starts the web server at the given port
 http.listen(port, function(){
-  console.log('Listening on ' + port);
+  console.log('Listening on ' + port); // TODO: remove this line?
 });
 
 // Some useful tools
@@ -52,7 +52,7 @@ function isInvitationCodeUsed(codeToCheck){
 	}
 	return -1;
 }
-function removeFromUsedCodeList(codeToRemove){
+function removeFromUsedInvitationCodeList(codeToRemove){
 	// return 1 if removed
 	// return 0 if not found
 	var removeInd = isInvitationCodeUsed(codeToRemove);
@@ -62,13 +62,14 @@ function removeFromUsedCodeList(codeToRemove){
 	}
 	return 0;
 }
-function assignNewCode(){
+function assignNewInvitationCode(){
 	// returns an invitation code that is not used. Note: This won't add the code to the list.
+	// TODO Soon: implement this
 }
 
 listOfChatRooms = [];
 function ChatRoom(){
-	var chatroomID = -1; // chatroomID is always integer
+	var chatroomID = -1; // chatroomID is always an integer
 	var listOfInvitationCodes = [];
 	var verificationCode = ""; // verification code is a String of length 30 or more
 	
@@ -125,12 +126,19 @@ function getChatroomInstanceWithID(targetID){
 	return -1;
 }
 function registerNewChatroom(){
-	// return the instance of the new chatroom
+	// return the instance of the new chatroom if successfully assigned
+	// return -1 if not successful
 	
-	// find appropriate chatroomID
-	listOfChatRooms.sort();
-	for(var ind=0; ind < listOfChatRooms.length; ind++){
-		
+	
+	function findAppropriateChatroomID(){
+		listOfChatRooms.sort();
+		var assignID = -1;
+		for(var ind=0; ind < listOfChatRooms.length; ind++){
+			if(listOfChatRooms[ind].getID != ind){
+				assignID = ind;
+				return assignID;
+			}
+		}
 	}
 }
 
@@ -155,35 +163,4 @@ io.on('connection', function (socket) {
 	
 	// message to the chatroom
 }
-
-
-
-
-
-
-//////////////
-people = [];
-function Person(newAge){
-	var name = "";
-	var age = newAge;
-	
-	this.getAge = function(){return age;}
-}
-people.push(new Person(10));
-people.push(new Person(20));
-people.push(new Person(15));
-people.push(new Person(12));
-people.push(new Person(13));
-people.push(new Person(19));
-
-// define the sort comparator
-people.sort(function(person1,person2){
-	return person1.getAge() - person2.getAge();
-})
-
-// do the sorting
-people.sort();
-
-
-console.log("" + people[0].getAge() + "," + people[1].getAge() + "," + people[2].getAge())
 
