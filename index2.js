@@ -19,6 +19,9 @@ http.listen(port, function(){
   console.log('Listening on ' + port); // TODO: remove this line?
 });
 
+// some parameters
+var administratorCodeLength = 50; // chatroom administrator's access code length (number of characters)
+
 // Some useful tools
 // // remove element form array at index
 Array.prototype.remove = function(from, to) {
@@ -72,6 +75,7 @@ function ChatRoom(){
 	var chatroomID = -1; // chatroomID is always an integer
 	var listOfInvitationCodes = [];
 	var verificationCode = ""; // verification code is a String of length 30 or more
+	var administratorCode = ""
 	
 	this.getID = function(){return chatroomID;}
 	this.setID = function(newID){chatroomID = newID;}
@@ -100,6 +104,14 @@ function ChatRoom(){
 	
 	this.setVerificationCode = function(newVerificationCode){verificationCode = newVerificationCode;}
 	this.getVerificationCode = function(){return verificationCode;}
+	
+	this.setAdministratorCode(newCode){
+		administratorCode = newCode;
+	}
+	this.getAdministratorCode(){
+		return administratorCode;
+	}
+	
 }
 listOfChatRooms.sort(function(chatroom1,chatroom2){
 	return chatroom1.chatroomID - chatroom2.chatroomID;
@@ -126,9 +138,19 @@ function getChatroomInstanceWithID(targetID){
 	return -1;
 }
 function registerNewChatroom(){
-	// return the instance of the new chatroom if successfully assigned
+	// return the instance of the new chatroom if successfully assigned. The newChatRoom will be added to the listOfChatRooms. The newChatRoom still need more initiation; only the id is set
 	// return -1 if not successful
-	
+	var targetID = findAppropriateChatroomID();
+	if(targetID > -1){ // if successfully found an appropriate ID for the chatroom
+		var newChatRoom = new ChatRoom();
+		newChatRoom.setID(targetID);
+		var administratorCode = makeRandomString(administratorCodeLength);
+		newChatRoom.setAdministratorCode(administratorCode);
+		listOfChatRooms.push(newChatRoom);
+		return newChatRoom;
+	} else {
+		return -1;
+	}
 	
 	function findAppropriateChatroomID(){
 		listOfChatRooms.sort();
@@ -139,6 +161,7 @@ function registerNewChatroom(){
 				return assignID;
 			}
 		}
+		return assignID;
 	}
 }
 
@@ -153,12 +176,22 @@ io.on('connection', function (socket) {
 	socket.join(socket.id); // TODO: think again. Should the chatroomID simply be the socket.id? would this affect the privacy?
 	
 	// request create new chatroom
-	socket.on('createChatRoom',function(){
+	socket.on('requestCreateChatroom',function(){
+		//updateUserChatroomID(socket.id, chatroomID);
+		//socket.join(chatroomID);
+		
+		var newChatRoom = registerNewChatroom();
+		if(newChatRoom instanceof ChatRoom){ // if chatroom was successfully created
+			io.to(socket.id).emit("chatroomCreationSuccessful",{
+										'chatroomID':newChatRoom.getID(),
+										'administratorCode':newChatRoom.getAdministratorCode()
+									})
+		} else { // the chatroom was not successfully created
+			
+		}
+		
+	});
 
-    updateUserChatroomID(socket.id, chatroomID);
-
-    socket.join(chatroomID);
-  });
 	// request join an existing chatroom
 	
 	// message to the chatroom
