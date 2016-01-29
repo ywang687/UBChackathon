@@ -16,11 +16,9 @@ app.get('/', function (req, res) {
 app.use(express.static('public'));
 // Starts the web server at the given port
 http.listen(port, function(){
-  console.log('Listening on ' + port); // TODO: remove this line?
+  console.log('Listening on ' + port); // TODO: remove this line for privacy
 });
 
-// some parameters
-var administratorCodeLength = 50; // chatroom administrator's access code length (number of characters)
 
 // Some useful tools
 // // remove element form array at index
@@ -66,8 +64,22 @@ function removeFromUsedInvitationCodeList(codeToRemove){
 	return 0;
 }
 function assignNewInvitationCode(){
-	// returns an invitation code that is not used. Note: This won't add the code to the list.
-	// TODO Soon: implement this
+	// returns an invitation code that is not used. The code will be added to listOfInvitationCodes
+	// if not successful, return -1
+	var isAssigned = false;
+	var numTrial = 0;
+	while(!isAssigned && numTrial < 1000){
+		numTrial++;
+		var newInvitationCode = makeRandomString(100);
+		if(!isInvitationCodeUsed(newInvitationCode)){ // if the code is available
+			addToUsedInvitationCode(newInvitationCode);
+			isAssigned = true;
+			return newVerificationCode;
+		} else {
+			isAssigned = false;
+		}
+	}
+	return -1;
 }
 
 listOfChatRooms = [];
@@ -75,7 +87,6 @@ function ChatRoom(){
 	var chatroomID = -1; // chatroomID is always an integer
 	var listOfInvitationCodes = [];
 	var verificationCode = ""; // verification code is a String of length 30 or more
-	var administratorCode = ""
 	
 	this.getID = function(){return chatroomID;}
 	this.setID = function(newID){chatroomID = newID;}
@@ -104,14 +115,6 @@ function ChatRoom(){
 	
 	this.setVerificationCode = function(newVerificationCode){verificationCode = newVerificationCode;}
 	this.getVerificationCode = function(){return verificationCode;}
-	
-	this.setAdministratorCode(newCode){
-		administratorCode = newCode;
-	}
-	this.getAdministratorCode(){
-		return administratorCode;
-	}
-	
 }
 listOfChatRooms.sort(function(chatroom1,chatroom2){
 	return chatroom1.chatroomID - chatroom2.chatroomID;
@@ -138,14 +141,14 @@ function getChatroomInstanceWithID(targetID){
 	return -1;
 }
 function registerNewChatroom(){
-	// return the instance of the new chatroom if successfully assigned. The newChatRoom will be added to the listOfChatRooms. The newChatRoom still need more initiation; only the id is set
+	// return the instance of the new chatroom if successfully assigned. The newChatRoom will be added to the listOfChatRooms. The newChatRoom still need more information; in this function, only the id is set
 	// return -1 if not successful
 	var targetID = findAppropriateChatroomID();
 	if(targetID > -1){ // if successfully found an appropriate ID for the chatroom
 		var newChatRoom = new ChatRoom();
 		newChatRoom.setID(targetID);
-		var administratorCode = makeRandomString(administratorCodeLength);
-		newChatRoom.setAdministratorCode(administratorCode);
+		var verificationCode = makeRandomString(50);
+		newChatRoom.setVerificationCode(verificationCode);
 		listOfChatRooms.push(newChatRoom);
 		return newChatRoom;
 	} else {
@@ -168,32 +171,43 @@ function registerNewChatroom(){
 
 
 io.on('connection', function (socket) {
-	
 	// when a new connection is made
 	// // print to condole
-	console.log(socket.id + " connected") // TODO: will remove this for privacy
+	console.log(socket.id + " connected") // TODO: will remove this line for privacy
 	// // create a private chatroom between the server and the user. The chatroomID is the socket.id. Such id is always String
 	socket.join(socket.id); // TODO: think again. Should the chatroomID simply be the socket.id? would this affect the privacy?
 	
 	// request create new chatroom
 	socket.on('requestCreateChatroom',function(){
-		//updateUserChatroomID(socket.id, chatroomID);
-		//socket.join(chatroomID);
-		
 		var newChatRoom = registerNewChatroom();
 		if(newChatRoom instanceof ChatRoom){ // if chatroom was successfully created
 			io.to(socket.id).emit("chatroomCreationSuccessful",{
 										'chatroomID':newChatRoom.getID(),
-										'administratorCode':newChatRoom.getAdministratorCode()
+										'verificationCode':newChatRoom.getVerificationCode()
 									})
 		} else { // the chatroom was not successfully created
-			
+			io.to(socket.id).emit("chatroomCreationFail",{'message':'Chat Room creation was unsuccessful. Please try again later'}); // TODO: say why the creation failed
 		}
-		
 	});
 
 	// request join an existing chatroom
+	socket.on('requestJoinChatRoom',function(invitationCode){
+		
+	});
 	
 	// message to the chatroom
+	socket.on('userMessage',function(chatroomID, chatroomVerificationCode, theMessage){
+		// check room exists and verification code correct
+		
+		// send message to all the participants
+		
+		// reply sender a sent receipt
+		
+	})
+	
+	// request (new) invitationCode
+	socket.on('requestNewInvitationCode',function(chatroomID, chatroomVerificationCode, originalInvitationCode){
+		// note: If there's no originalInvitationCode, just leave it as empty string. The purpose is to release the old invitationCode
+	})
 }
 
