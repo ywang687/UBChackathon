@@ -2,79 +2,51 @@
 <html>
 <head>
   <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
-  <link href="index_style.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<link href="index_style.css" rel="stylesheet">
 </head>
 
 
 
 <body>
-  <section class="module">
-  
-  <header class="top-bar">
-    <div class="left">
-      <span class="icon typicons-message"></span>
-          <h1>&nbsp;Current Chat ID: <var id="chatID">chatID</var></h1>
-    </div>
-    
+	<label>New Chat room: </label><button id="btnCreateRoom" onclick="btnClick_requestCreateChatroom()">Create</button><br />
+	<label>Join Chat room: </label><input id="txtChatroomInvitationCode" placeholder="invitationCode"/><button id="btnJoinRoom" onclick="btnClick_requestJoinChatroom()">Join!</button><br /><br />
+	<label>Message To Send:</label><input placeholder="Chatroom ID" id="txtChatroomIDToSend"/><input placeholder="verificationCode" id="txtVerificationCode"><input placeholder="messageToSend" id="txtMsg"/><button onclick="btnClick_sendUserMessage()">Send</button><br />
+	<label>Request new invitation code</label><input id="txtChtRmNeedNewInv" placeholder="chatroom ID"/><input id="txtVerificationChatroom" placeholder="verification code"/><input id="txtOrigInvitationCode" placeholder="(optional) original invitation code"/><button onclick="btnClick_requestInvitationCode()">Request</button>
+	<br /><br />
+	<textarea id="txtConsole"></textarea>
 
-    
-  </header>
-      <div class="messages">
-        <div class="col-lg-6">
-        <ul class="list-group" id="messages"></ul>
-        </div><!-- /.col-lg-6 -->
-      </div>
-
-  
-</section>
-  <nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <a class="navbar-brand" href="#">UmbraChat</a>
-      </div>
-    </div>
-  </nav>
-
-  <div class="container">
-    <div class="row">
-      
-    </div><!-- /.row -->
-  </div><!-- /.container -->
-
- <div class="container">
-    <div class="row hold-bottom">
-      <div class="col-lg-6">
-
-<label>Encryption Key</label>
-<input type="text" class="form-control" id='encKey' placeholder="Encryption Key">
-<button onclick="setEncryptionKey()">Set Key</button>
-<br />
-
-Join Chat Room with ID: <input type="text" size="20" id="chatRmIDToJoin">
-<button onclick="joinchatroom()">Submit</button>
-
-
-<button onclick="createchatroom()">Create Chat Room with Random ID</button>
-
-
-<p id="demo"></p>
-        <div class="input-group">
-          <input type="text" class="form-control" id='msg' placeholder="Type your message...">
-          <span class="input-group-btn">
-            <button class="btn btn-default" type="button" id='msg-click'>Send!</button>
-            </span>
-        </div><!-- /input-group -->
-      </div><!-- /.col-lg-6 -->
-    </div><!-- /.row -->
-
-  <!-- Latest compiled and minified JavaScript -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
   <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
-
-  <!-- Our JavaScript for the Socket IO connection -->
-  <script src="index_script.js"></script>
+  <script src="newController.js"></script>
+  
+  <script>
+	function btnClick_requestCreateChatroom(){
+		requestCreateChatroom()
+	}
+	function btnClick_requestJoinChatroom(){
+		var invitationCode = $("#txtChatroomInvitationCode").val();
+		requestJoinChatroom(invitationCode)
+	}
+	function btnClick_sendUserMessage(){
+		var chatroomID = $("#txtChatroomIDToSend").val();
+		var chatroomVerificationCode = $("#txtVerificationCode").val();
+		var theMessage = $("#txtMsg").val();
+		
+		sendUserMessage(chatroomID, chatroomVerificationCode, theMessage)
+	}
+	function btnClick_requestInvitationCode(){
+		var chatroomID = Number($("#txtChtRmNeedNewInv").val());
+		var chatroomVerificationCode = $("#txtVerificationChatroom").val();
+		var origInvitationCode = $("#txtOrigInvitationCode").val();
+		
+		requestInvitationCode(chatroomID, chatroomVerificationCode, origInvitationCode);
+	}
+	
+	function mkLog(message){
+		$("#txtConsole").val($("#txtConsole").val() + message + "\n")
+	}
+  </script>
 </body>
 </html>
