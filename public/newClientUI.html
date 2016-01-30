@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+  <!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<link href="index_style.css" rel="stylesheet">
+</head>
+
+
+
+<body>
+	<label>New Chat room: </label><button id="btnCreateRoom" onclick="btnClick_requestCreateChatroom()">Create</button><br />
+	<label>Join Chat room: </label><input id="txtChatroomInvitationCode" placeholder="invitationCode"/><button id="btnJoinRoom" onclick="btnClick_requestJoinChatroom()">Join!</button><br /><br />
+	<label>Message To Send:</label><input placeholder="Chatroom ID" id="txtChatroomIDToSend"/><input placeholder="verificationCode" id="txtVerificationCode"><input placeholder="messageToSend" id="txtMsg"/><button onclick="btnClick_sendUserMessage()">Send</button><br />
+	<label>Request new invitation code</label><input id="txtChtRmNeedNewInv" placeholder="chatroom ID"/><input id="txtVerificationChatroom" placeholder="verification code"/><input id="txtOrigInvitationCode" placeholder="(optional) original invitation code"/><button onclick="btnClick_requestInvitationCode()">Request</button>
+	<br /><br />
+	<textarea id="txtConsole"></textarea>
+
+  <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+  <script src="newController.js"></script>
+  
+  <script>
+	function btnClick_requestCreateChatroom(){
+		requestCreateChatroom()
+	}
+	function btnClick_requestJoinChatroom(){
+		var invitationCode = $("#txtChatroomInvitationCode").val();
+		requestJoinChatroom(invitationCode)
+	}
+	function btnClick_sendUserMessage(){
+		var chatroomID = $("#txtChatroomIDToSend").val();
+		var chatroomVerificationCode = $("#txtVerificationCode").val();
+		var theMessage = $("#txtMsg").val();
+		
+		sendUserMessage(chatroomID, chatroomVerificationCode, theMessage)
+	}
+	function btnClick_requestInvitationCode(){
+		var chatroomID = Number($("#txtChtRmNeedNewInv").val());
+		var chatroomVerificationCode = $("#txtVerificationChatroom").val();
+		var origInvitationCode = $("#txtOrigInvitationCode").val();
+		
+		requestInvitationCode(chatroomID, chatroomVerificationCode, origInvitationCode);
+	}
+	
+	function mkLog(message){
+		$("#txtConsole").val($("#txtConsole").val() + message + "\n")
+	}
+  </script>
+</body>
+</html>
